@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>memeLCD</title>
+  
+<!--Pico - Minimal CSS Framework for semantic info: HTML https://picocss.com/ -->
+<link rel="stylesheet" type="text/css" href="css/pico.fluid.classless.css">
+<link rel="stylesheet" type="text/css" href="myStyle.css">
+
+
+</head>
+<body>
+  <main class="BTNcontainer">
+    <article class="grid">
+        <button class="collapsible">memeLCD settings</button>
+        <div class="content">
+          <div style="text-align:center">
+          <hgroup>
+            <h1>memeLCD</h1>
+            </hgroup>
+            <label for="remember">
+            <input type="checkbox" role="switch" id="toggle-stop" name="toggle-stop">
+              Stop slideshow at specific image
+            </label>
+          <br>
+        <p id="esp-response"></p>
+        <!-- <With HTML 5 we can use custom element attributes, so keep track where we want the result of form submit -->
+        <form action="/setperiod" data-result="result-period" enctype="text/plain" method="post">
+        <p><label for="period">Set slideshow period</label><input type="number" id="period" name="imageperiod" placeholder="Seconds..."></p> 
+        <br>
+    	    <input type="submit">
+        </form>
+        <br><br>
+        <p id="result-period"></p>
+      </div>
+    </article>
+    
+<div style="text-align:center">
+  <h2>memeLCD image gallery</h2>
+  <p>Click on the images below to expand</p>
+</div>
+
+<!-- The four columns -->
+<div class="row">
+  <div class="column">
+    <img src="img1.png" onerror="this.onerror=null; this.src=''" alt="" style="width:100%" onclick="myFunction(this);">
+  </div>
+  <div class="column">
+    <img src="img2.png" onerror="this.onerror=null; this.src=''" alt="" style="width:100%" onclick="myFunction(this);">
+  </div>
+  <div class="column">
+    <img src="img3.png" onerror="this.onerror=null; this.src=''" alt="" style="width:100%" onclick="myFunction(this);">
+  </div>
+  <div class="column">
+    <img src="img4.png" onerror="this.onerror=null; this.src=''" alt="" style="width:100%" onclick="myFunction(this);">
+  </div>
+  <div class="column">
+    <img src="img5.png" onerror="this.onerror=null; this.src=''" alt="" style="width:100%" onclick="myFunction(this);">
+  </div>
+  <div class="column">
+    <img src="img6.png" onerror="this.onerror=null; this.src=''" alt="" style="width:100%" onclick="myFunction(this);">
+  </div>
+  <div class="column">
+    <img src="img7.png" onerror="this.onerror=null; this.src=''" alt="" style="width:100%" onclick="myFunction(this);">
+  </div>
+  <div class="column">
+    <img src="img8.png" onerror="this.onerror=null; this.src=''" alt="" style="width:100%" onclick="myFunction(this);">
+  </div>
+  <div class="column">
+    <img src="img9.png" onerror="this.onerror=null; this.src=''" alt="" style="width:100%" onclick="myFunction(this);">
+  </div>
+  <div class="column">
+    <img src="img10.png" onerror="this.onerror=null; this.src=''" alt="" style="width:100%" onclick="myFunction(this);">
+  </div>
+</div>
+
+<div class="container">
+  <span onclick="this.parentElement.style.display='none'" class="closebtn">&times;</span>
+  <img id="expandedImg" style="width:100%">
+  <div id="imgtext"></div>
+</div>
+
+<script>
+//========================Pause function========
+      function toggleStop() {
+        const pars = new URLSearchParams({
+          val:  document.getElementById('toggle-stop').checked ? '1' : '0'
+        });
+        
+        fetch('/memelcd?' + pars )                // Do the request
+        .then(response => response.text())    // Parse the response 
+        .then(text => {                       // DO something with response
+          console.log(text);
+          document.getElementById('esp-response').innerHTML = text;
+        });
+      }
+      
+      document.getElementById('toggle-stop').addEventListener('change', toggleStop );
+//==============================================
+
+//=====================image grid===============
+      function myFunction(imgs) {
+      var expandImg = document.getElementById("expandedImg");
+      var imgText = document.getElementById("imgtext");
+      expandImg.src = imgs.src;
+      imgText.innerHTML = imgs.alt;
+      expandImg.parentElement.style.display = "block";
+    }
+//==============================================
+
+// Expand or collapse the content according to current state
+function expandCollapse() {
+  // Get the HTML element immediately following the button (content)
+  var content = this.nextElementSibling; 
+  if (content.style.maxHeight) 
+    content.style.maxHeight = null;
+  else 
+    content.style.maxHeight = content.scrollHeight + "px";
+}
+
+// Select all "+" HTML buttons in webpage and add a listener for each one
+const btnList = document.querySelectorAll(".collapsible");
+btnList.forEach(elem => {
+  elem.addEventListener("click", expandCollapse ); // Set callback function linked to the button click
+});
+
+// This listener will execute an "arrow" function once the page was fully loaded
+document.addEventListener("DOMContentLoaded", () => {
+  console.log('Webpage is fully loaded');
+  
+  // At first, get the default values for form input elements from ESP
+  fetch('/getDefault')
+    .then(response => response.json())  // Parse the server response
+    .then(jsonObj => {                     // Do something with parsed response
+      console.log(jsonObj);
+      document.getElementById('period').value = jsonObj.period;
+    });
+});
+
+      // This listener will prevent each form to reload page after submitting data
+document.addEventListener("submit", (e) => {
+  const form = e.target;        // Store reference to form to make later code easier to read
+  fetch(form.action, {          // Send form data to server using the Fetch API
+      method: form.method,
+      body: new FormData(form),
+
+    })
+ 
+    .then(response => response.text())  // Parse the server response
+    .then(text => {                     // Do something with parsed response
+      console.log(text);
+      const resEl = document.getElementById(form.dataset.result).innerHTML= text;
+    });
+  
+  e.preventDefault();                 // Prevent the default form submit wich reload page
+});
+      ////////////////////////////////////////////////////////////////////////////////////////////
+
+</script>
+
+</body>
+</html>
+
+
