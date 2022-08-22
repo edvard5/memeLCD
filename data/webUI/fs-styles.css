@@ -1,0 +1,80 @@
+    body {
+        font-size: 12px;
+        font-family: Verdana, Arial, Sans-serif
+    }
+
+    #status {
+        position: absolute;
+        top: 3px;
+        right: 10px;
+        font-size: 15px
+    }
+
+    #fsMeter {
+        width: 100px;
+        padding-bottom: 2px
+    }
+
+    #warning {
+        height: 100%;
+        background-color: orange;
+        color: #000
+    }
+
+    #warning:hover .tooltip {
+        visibility: visible
+    }
+
+    #loading {
+        position: absolute;
+        top: -100vh;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 100;
+        background-color: rgba(0, 0, 0, .5);
+        opacity: 0;
+        transition: opacity .5s ease-in-out
+    }
+
+    #loading.shown {
+        top: 0;
+        opacity: 1
+    }
+
+    #loading-msg {
+        display: inline-block;
+        position: absolute;
+        top: 45%;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #fff;
+        font-size: 32px
+    }
+
+    @keyframes spinner-anim {
+        0% {
+            transform: rotate(0)
+        }
+
+        100% {
+            transform: rotate(360deg)
+        }
+    }
+
+    .spinner-anim:not(:required) {
+        display: inline-block;
+        position: relative;
+        top: 50%;
+        left: 0%;
+        transform: translate(-50%, -50%);
+        animation: spinner-anim 1s infinite linear;
+        border: 16px solid #eee;
+        border-right-color: transparent;
+        border-radius: 32px;
+        box-sizing: border-box;
+        overflow: hidden;
+        text-indent: -9999px;
+        width: 64px;
+        height: 64px
+    }
