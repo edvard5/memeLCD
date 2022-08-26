@@ -8,7 +8,7 @@
 File pngfile;
 
 PNG png;
-#define MAX_IMAGE_WDITH 128 // Adjust for your images
+#define MAX_IMAGE_WDITH 240 // Adjust for your images
 
 int16_t xpos = 0;
 int16_t ypos = 0;

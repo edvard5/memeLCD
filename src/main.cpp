@@ -117,7 +117,7 @@ void setup()
   // Initialise the TFT
   tft.begin();
   tft.fillScreen(TFT_BLACK);
-  tft.setRotation(2);
+  tft.setRotation(0);
 
   timex = millis();
   Serial.println("\r\nInitialisation done.");
