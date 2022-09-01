@@ -15,16 +15,6 @@ function toggleStop() {
   document.getElementById('toggle-stop').addEventListener('change', toggleStop );
 //==============================================
 
-//=====================image grid===============
-//   function myFunction(imgs) {
-//   var expandImg = document.getElementById("expandedImg");
-//   var imgText = document.getElementById("imgtext");
-//   expandImg.src = imgs.src;
-//   imgText.innerHTML = imgs.alt;
-//   expandImg.parentElement.style.display = "block";
-// }
-//==============================================
-
 // Expand or collapse the content according to current state
 function expandCollapse() {
 // Get the HTML element immediately following the button (content)

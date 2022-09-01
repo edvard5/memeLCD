@@ -1,45 +1,46 @@
+// memeLCD https://github.com/edvard5/memeLCD
+// created by edvard5
+//==============================================================================
 
-// This example if for processors with LittleFS capability (e.g. RP2040,
-// ESP32, ESP8266). It renders a png file that is stored in LittleFS
-// using the PNGdec library (available via library manager).
-
-// The test image is in the sketch "data" folder (press Ctrl+K to see it).
-// You must upload the image to LittleFS using the Arduino IDE Tools Data
-// Upload menu option (you may need to install extra tools for that).
-
-// Don't forget to use the Arduino IDE Tools menu to allocate a LittleFS
-// memory partition before uploading the sketch and data!
-
-#include <esp-fs-webserver.h>  // https://github.com/cotestatnt/esp-fs-webserver
+#include <esp-fs-webserver.h>
 #include <esp-fs-webserver.cpp>
 #include <ESPmDNS.h>
 #include <PNG_FS_Support.cpp>
 
+//==============================================================================
+//                                 Variables
+//==============================================================================
+int firep1=19;                      // Pin for fire pit bowl LED1
+int firep2=21;                      // Pin for fire pit bowl LED2
+int period=3000;                    // Time how frequently image changes
+int i=0;                            // Image counter variable
+int x=0;                            // Reverse image counter from last to first
+int pngc=1;                         // PNGs counter for array of listpng
+unsigned long timex=millis();       // Timer for how frequently image changes
+unsigned long timefire=millis();    // Timer for how frequently fire pit bowl refreshes
+int stop=0;                         // Pause variable
+int nx;                             // Variable showing if all images have been shown
+//==============================================================================
 
-int firep1=19;
-int firep2=21;
-int period=3000;
-int i=0;
-int x=0;
-int pngc=1;
-unsigned long timex=millis();
-unsigned long timefire=millis();
-int stop=0;
-int nx;
-//====================================================================================
+
+//==============================================================================
 //                                   WEBSERVER Setup
-//====================================================================================
+//==============================================================================
 bool apMode = false;
 WebServer server(80);
 FSWebServer myWebServer(FileSys, server);
+//==============================================================================
 
-////////////////////////////////  Filesystem  /////////////////////////////////////////
+
+//==============================================================================
+//                                   Filesystem setup
+//==============================================================================
 void startFilesystem(){
   // FILESYSTEM INIT
   FileSys.begin();
   if (!FileSys.begin()) {
     Serial.println("LittleFS initialisation failed!");
-    while (1) yield(); // Stay here twiddling thumbs waiting
+    while (1) yield(); 
     Serial.println("ERROR on mounting filesystem. Restarting ESP");
     delay(2000);
     ESP.restart();
@@ -56,12 +57,14 @@ void startFilesystem(){
     Serial.println();
   }
 }
+//==============================================================================
 
-////////////////////////////  HTTP Request Handlers  ////////////////////////////////////
+
+//==============================================================================
+//                                   HTTP Request Handlers
+//==============================================================================
 void handlepause() {
   WebServerClass* webRequest = myWebServer.getRequest();
-
-  // http://xxx.xxx.xxx.xxx/led?val=1
   if(webRequest->hasArg("val")) {
     int value = webRequest->arg("val").toInt();
     stop = value;
@@ -89,18 +92,20 @@ void handlePeriodSet() {
   Serial.println(reply);
   webRequest->send(200, "text/plain", reply);
 }
+//==============================================================================
 
 
-//====================================================================================
+//==============================================================================
 //                                    Setup
-//====================================================================================
+//==============================================================================
 void setup()
 {
+  // Initialise serial for debugging
   Serial.begin(9600);
   Serial.println("\n\n Using the PNGdec library");
+
   // Initialise FS
   startFilesystem();
-
 
   // Initialise WEBserver
   // Try to connect to flash stored SSID, start AP if fails after timeout
@@ -110,24 +115,22 @@ void setup()
   myWebServer.addHandler("/getDefault", HTTP_GET, getDefaultValue);
   myWebServer.addHandler("/memelcd", HTTP_GET, handlepause);
   myWebServer.addHandler("/setperiod", HTTP_POST, handlePeriodSet);
+
   // Start webserver
   if (myWebServer.begin()) {
     Serial.print(F("ESP Web Server started on IP Address: "));
     Serial.println(myIP);
-    Serial.println(F("Open /setup page to configure optional parameters"));
-    Serial.println(F("Open /edit page to view and edit files"));
+    Serial.println(F("Open /setup page to configure WIFI settings"));
+    Serial.println(F("Open /edit page to view and edit files in FSbrowser"));
     Serial.println(F("Open /update page to upload firmware and filesystem updates"));
   }
 
-  // Initialise the TFT
+  // Initialise  TFT screen
   tft.begin();
   tft.fillScreen(TFT_BLACK);
   tft.setRotation(0);
 
-  timex = millis();
-  Serial.println("\r\nInitialisation done.");
-
-
+  // Initialise local mDNS
   if (!MDNS.begin("memelcd")) {
     Serial.println("Error setting up MDNS responder!");
     while(1) {
@@ -136,18 +139,19 @@ void setup()
     }
   MDNS.addService("http", "tcp", 80);
 
+  // Additional outputs and variable sets
   pinMode(OUTPUT,firep1);
   pinMode(OUTPUT,firep2);
+  timex = millis();
+  Serial.println("\r\nInitialisation done.");
 }
+//==============================================================================
 
 
-//====================================================================================
+//==============================================================================
 //                                    Loop
-//====================================================================================
-
-
-void loop()
-{
+//==============================================================================
+void loop(){
     
     //====== Count png files ============
     if(i==0){
