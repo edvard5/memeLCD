@@ -14,11 +14,16 @@
 #include <esp-fs-webserver.cpp>
 #include <ESPmDNS.h>
 #include <PNG_FS_Support.cpp>
+
+
+int firep1=19;
+int firep2=21;
 int period=3000;
 int i=0;
 int x=0;
 int pngc=1;
 unsigned long timex=millis();
+unsigned long timef=millis();
 int stop=0;
 int nx;
 //====================================================================================
@@ -131,12 +136,16 @@ void setup()
     }
   MDNS.addService("http", "tcp", 80);
 
+  pinMode(OUTPUT,firep1);
+  pinMode(OUTPUT,firep2);
 }
 
 
 //====================================================================================
 //                                    Loop
 //====================================================================================
+
+
 void loop()
 {
     
@@ -156,8 +165,17 @@ void loop()
     //===================================
 
   while(nx!=0){
+    
     //============ FSbrowser ============
     myWebServer.run();
+    //===================================
+
+    //============ Fire pit fx ==========
+    if(millis()-timef>100){
+      analogWrite(firep1,random(120)+135);
+      analogWrite(firep2,random(120)+135);
+      timef=millis();
+    }
     //===================================
 
     //============ Load PNG into array =============
