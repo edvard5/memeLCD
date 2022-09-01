@@ -23,7 +23,7 @@ int i=0;
 int x=0;
 int pngc=1;
 unsigned long timex=millis();
-unsigned long timef=millis();
+unsigned long timefire=millis();
 int stop=0;
 int nx;
 //====================================================================================
@@ -165,16 +165,16 @@ void loop()
     //===================================
 
   while(nx!=0){
-    
+
     //============ FSbrowser ============
     myWebServer.run();
     //===================================
 
     //============ Fire pit fx ==========
-    if(millis()-timef>100){
+    if(millis()-timefire>100){
       analogWrite(firep1,random(120)+135);
       analogWrite(firep2,random(120)+135);
-      timef=millis();
+      timefire=millis();
     }
     //===================================
 
