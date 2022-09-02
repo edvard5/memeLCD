@@ -1,3 +1,29 @@
+//====================Fire brightness===========
+    var slider = document.getElementById("myRange");
+    var output = document.getElementById("demo");
+    output.innerHTML = slider.value;
+
+    slider.oninput = function() {
+    output.innerHTML = this.value; 
+    }
+
+    function fbrightness(){
+    var slider = document.getElementById("myRange");
+    const pars = new URLSearchParams({
+         bval:  slider.value
+       });
+      fetch('/myRange?' + pars )   
+}
+document.getElementById('myRange').addEventListener('change', fbrightness );
+//========================FX function===========
+function toggleFX() {
+    const pars = new URLSearchParams({
+      fxval:  document.getElementById('fx-switch').checked ? '1' : '0'
+    });
+    
+    fetch('/ffx?' + pars )                // Do the request
+}
+  document.getElementById('fx-switch').addEventListener('change', toggleFX );
 //========================Pause function========
 function toggleStop() {
     const pars = new URLSearchParams({

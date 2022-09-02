@@ -20,6 +20,10 @@ unsigned long timex=millis();       // Timer for how frequently image changes
 unsigned long timefire=millis();    // Timer for how frequently fire pit bowl refreshes
 int stop=0;                         // Pause variable
 int nx;                             // Variable showing if all images have been shown
+int fBrightness=67;                 // firebrightness starting value
+int rfBrightness=120;               // random fire brightness starting max value
+int ffx=0;                          // effect toggle for fire max power when image change occurs
+int lastrfB;                        // last known value for last fire
 //==============================================================================
 
 
@@ -92,6 +96,29 @@ void handlePeriodSet() {
   Serial.println(reply);
   webRequest->send(200, "text/plain", reply);
 }
+
+void handlefbrightness(){
+  WebServerClass* webRequest = myWebServer.getRequest();
+  if(webRequest->hasArg("bval")){
+    int value = webRequest->arg("bval").toInt();
+    fBrightness = value * 1.08; // daugiklis kad 100%=135PWM
+    Serial.println(fBrightness);
+  if(value==0){
+    rfBrightness = value;
+  }
+  else
+    rfBrightness = value * 0.96;
+  }
+}
+
+void handlefeffect(){
+  WebServerClass* webRequest = myWebServer.getRequest();
+  if(webRequest->hasArg("fxval")){
+    int value = webRequest->arg("fxval").toInt();
+    ffx = value;
+
+  }
+}
 //==============================================================================
 
 
@@ -115,6 +142,8 @@ void setup()
   myWebServer.addHandler("/getDefault", HTTP_GET, getDefaultValue);
   myWebServer.addHandler("/memelcd", HTTP_GET, handlepause);
   myWebServer.addHandler("/setperiod", HTTP_POST, handlePeriodSet);
+  myWebServer.addHandler("/myRange", HTTP_GET, handlefbrightness);
+  myWebServer.addHandler("/ffx", HTTP_GET, handlefeffect);
 
   // Start webserver
   if (myWebServer.begin()) {
@@ -176,12 +205,11 @@ void loop(){
 
     //============ Fire pit fx ==========
     if(millis()-timefire>100){
-      analogWrite(firep1,random(120)+135);
-      analogWrite(firep2,random(120)+135);
+      analogWrite(firep1,lastrfB = random(rfBrightness)+fBrightness);
+      analogWrite(firep2,random(rfBrightness)+fBrightness);
       timefire=millis();
     }
     //===================================
-
     //============ Load PNG into array =============
     if(i<(sizeof(listpng)/sizeof(listpng[0]))-1){
         File root = FileSys.open("/", "r");
@@ -206,6 +234,13 @@ void loop(){
             // Pass support callback function names to library
             if(stop==0){
             int16_t rc = png.open(listpng[x].c_str(), pngOpen, pngClose, pngRead, pngSeek, pngDraw);
+            if(ffx==1){
+              for(int glow=lastrfB ; glow <= 255; glow++ ){  
+                analogWrite(firep1,glow);
+                analogWrite(firep2,glow);
+                delay(1);
+              }
+            }
             if (rc == PNG_SUCCESS) {
                 tft.startWrite();
                 Serial.printf("image specs: (%d x %d), %d bpp, pixel type: %d\n", png.getWidth(), png.getHeight(), png.getBpp(), png.getPixelType());
@@ -213,6 +248,13 @@ void loop(){
                 png.close();
                 }
             tft.endWrite();
+              if(ffx==1){
+                for(int glow=255 ; glow>=lastrfB ; glow--){  
+                analogWrite(firep1,glow);
+                analogWrite(firep2,glow);
+                delay(1);
+                }
+              }
             x--;
             }  
             timex=millis();

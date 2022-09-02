@@ -19,11 +19,11 @@
             </hgroup>
             <label for="remember">
             <input type="checkbox" role="switch" id="toggle-stop" name="toggle-stop">
-              Stop slideshow at specific image
+              Stop slideshow at current image
             </label>
           <br>
         <p id="esp-response"></p>
-        <!-- <With HTML 5 we can use custom element attributes, so keep track where we want the result of form submit -->
+<!-- Slideshow period input box -->
         <form action="/setperiod" data-result="result-period" enctype="text/plain" method="post">
         <p><label for="period">Set slideshow period</label><input type="number" id="period" name="imageperiod" placeholder="Seconds..."></p> 
         <br>
@@ -32,6 +32,18 @@
         <br><br>
         <p id="result-period"></p>
       </div>
+<!-- Brightness slider-->
+      <div class="slidecontainer">
+        <input type="range" min="0" max="100" value="50" class="slider" id="myRange">
+        <p>Brightness: <span id="demo"></span>%</p>
+
+        <label for="remember">
+          <input type="checkbox" role="switch" id="fx-switch" name="effect-switch">
+            FX on image change
+          </label>
+      </div>
+<!--==================-->
+
     </article>
   </body>
 </head>
