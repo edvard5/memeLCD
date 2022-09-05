@@ -6,10 +6,16 @@
 #include <esp-fs-webserver.cpp>
 #include <ESPmDNS.h>
 #include <PNG_FS_Support.cpp>
+#include <FastLED.h>
+
 
 //==============================================================================
 //                                 Variables
 //==============================================================================
+#define LED_PIN 32
+#define NUM_LEDS 1
+CRGB leds[NUM_LEDS];
+
 int firep1=19;                      // Pin for fire pit bowl LED1
 int firep2=21;                      // Pin for fire pit bowl LED2
 int period=3000;                    // Time how frequently image changes
@@ -173,6 +179,7 @@ void setup()
   pinMode(OUTPUT,firep2);
   timex = millis();
   Serial.println("\r\nInitialisation done.");
+  FastLED.addLeds<WS2812, LED_PIN, GRB>(leds, NUM_LEDS);
 }
 //==============================================================================
 
@@ -181,7 +188,8 @@ void setup()
 //                                    Loop
 //==============================================================================
 void loop(){
-    
+    leds[0] = CRGB(255,145,0);
+    FastLED.show();
     //====== Count png files ============
     if(i==0){
     File root = FileSys.open("/", "r");
